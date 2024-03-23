@@ -1,8 +1,8 @@
 #deployment.yaml
 #namespace: devops
-replicaCount: 1
+replicaCount: 2
 image:
-  repository: thiyagu2897/homepro:v1
+  repository: thiyagu2897/prothiyagu:v1
   tag: v1
 containerPort: 80
 # service.yaml
