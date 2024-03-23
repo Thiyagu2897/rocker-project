@@ -1,53 +1,31 @@
 pipeline {
     agent any
+
     stages {
-        stage ('SCM checkout') {
+        stage('GIT CHECKOUT') {
             steps {
-                script{
-                     git credentialsId: 'git-cred', url: 'https://github.com/naresh26git/helm-node.git'
-                }
+                git credentialsId: 'git-pass', url: 'https://github.com/Thiyagu2897/rocker-project.git'
             }
         }
-        stage ('SonarQube Code analysis'){
-            steps {
-                script{
-                    def scannerHome = tool 'sonarscanner4';
-                    withSonarQubeEnv('sonar-pro') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=rocket-nodejs"
-                    }
-                }
-            }
-        }
-        stage ('Build') {
+                stage ('packaging') {
             steps {
                 script{
                      sh 'npm install'
                 }
             }
         }
-        stage('Docker Build Images') {
+             stage ('docker image build') {
             steps {
-                script {
-                    sh 'docker build -t naresh2603/helm-rocket:v1 .'
-                    sh 'docker images'
-                }
-            }
-        }
-        stage('Docker Push') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'dockerPass', variable: 'dockerPassword')]) {
-                        sh "docker login -u naresh2603 -p ${dockerPassword}"
-                        sh 'docker push naresh2603/helm-rocket:v1'
-                        sh 'trivy image naresh2603/helm-rocket:v1 > scan.txt'
-                    }
+                script{
+                     sh "docker build -t thiyagu2897/prothiyagu:v1 ."
+                     sh "docker images"
                 }
             }
         }
         stage('Deploy on k8s') {
             steps {
                 script {
-                    withKubeCredentials(kubectlCredentials: [[ credentialsId: 'kubernetes' ]]) {
+                    withKubeCredentials(kubectlCredentials: [[ credentialsId: 'kube-pass' ]]) {
                         sh 'kubectl create secret generic helm --from-file=.dockerconfigjson=/opt/docker/config.json  --type kubernetes.io/dockerconfigjson --dry-run=client -oyaml > secret.yaml'
                         sh 'kubectl apply -f secret.yaml'
                         sh 'helm package ./Helm'
