@@ -2,7 +2,7 @@
 #namespace: devops
 replicaCount: 2
 image:
-  repository: thiyagu2897/prothiyagu:v1
+  repository: thiyagu2897/march28:v1
   tag: v1
 containerPort: 80
 # service.yaml
